@@ -15,21 +15,22 @@ services:
     command: [
       "--config=mainnet",
       "--datadir=/nethermind",
-      "--Init.WebSocketsEnabled=true",
       "--JsonRpc.Enabled=true",
       "--JsonRpc.Host=0.0.0.0",
       "--JsonRpc.Port=8545",
-      "--JsonRpc.WebSocketsPort=8546",
-      "--JsonRpc.JwtSecretFile=/engine.jwt",
       "--JsonRpc.EngineHost=0.0.0.0",
       "--JsonRpc.EnginePort=8551",
-      "--Merge.Enabled=true",
+      "--JsonRpc.JwtSecretFile=/engine.jwt",
+      "--Sync.SnapSync=true",
+      "--Sync.AncientBodiesBarrier=11000000",
+      "--Sync.AncientReceiptsBarrier=11000000",
+      "--Sync.DownloadBodiesInFastSync=true",
+      "--Sync.DownloadReceiptsInFastSync=true",
+      "--Network.MaxActivePeers=100",
       "--Network.DiscoveryPort=30303",
       "--Network.P2PPort=30303",
-      "--Sync.FastSync=true",
-      "--Pruning.Mode=Full",
+      "--Pruning.Mode=Hybrid",
       "--HealthChecks.Enabled=true",
-      "--HealthChecks.UIEnabled=true"
     ]
     depends_on:
       - lighthouse

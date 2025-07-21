@@ -15,9 +15,13 @@ docker exec -it frpc sh
 docker network ls
 docker network inspect ethereumnode_default
 docker ps -a
+docker-compose restart
 docker exec -it lighthouse bash
 docker logs nethermind --tail 50
 docker logs lighthouse --tail 50
+
+#Monitorear logs específicos
+docker logs nethermind --tail 100 -f | grep -E 'Old Headers|Snap|Peers'
 
 
 
@@ -127,6 +131,10 @@ sudo wg-quick up wg0
 nethermind
 **********
 
+# Detener de forma correcta el nodo de Nethermaind
+docker stop nethermind
+
+
 #CONSULTAR SI EL NODO ESTÁ CORRIENDO consultando el numero del bloque
 curl -X POST http://localhost:8545 \
   -H "Content-Type: application/json" \
@@ -138,3 +146,9 @@ curl -X POST http://localhost:8545 \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"eth_syncing","params":[]}'
 
+#Consultar peer conectados
+Mauro@DESKTOP-0JKN22F MINGW64 ~/Documents/Ethereum node
+$ curl -X POST http://localhost:8545 \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"net_peerCount","params":[]}'
+{"jsonrpc":"2.0","result":"0x29","id":1}
