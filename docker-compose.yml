@@ -22,15 +22,16 @@ services:
       "--JsonRpc.EnginePort=8551",
       "--JsonRpc.JwtSecretFile=/engine.jwt",
       "--Sync.SnapSync=true",
+      "--Init.StoreReceipts=false",
       "--Sync.AncientBodiesBarrier=11000000",
-      "--Sync.AncientReceiptsBarrier=11000000",
-      "--Sync.DownloadBodiesInFastSync=true",
-      "--Sync.DownloadReceiptsInFastSync=true",
-      "--Network.MaxActivePeers=100",
+      "--Network.MaxActivePeers=75",
       "--Network.DiscoveryPort=30303",
       "--Network.P2PPort=30303",
-      "--Pruning.Mode=Hybrid",
+      "--Pruning.Mode=Full",
+      "--Pruning.CacheMb=1024",
+      "--Pruning.FullPruningCompletionBehavior=ShutdownOnSuccess",
       "--HealthChecks.Enabled=true",
+      "--JsonRpc.EnabledModules=eth,TxPool,net,web3",
     ]
     depends_on:
       - lighthouse

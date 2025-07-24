@@ -7,9 +7,16 @@ docker-compose up -d
 docker exec -it geth-mempool geth attach
 eth.syncing
 eth.blockNumber
+docker system df
 docker restart geth-mempool
 docker restart frpc
 docker-compose down && docker-compose up -d
+
+#ver la cantidad de disco que ocupa docker
+docker system df
+
+#Eliminá imágenes y contenedores que no usás:
+docker system prune -a --volumes
 docker logs frpc
 docker exec -it frpc sh
 docker network ls
@@ -19,6 +26,41 @@ docker-compose restart
 docker exec -it lighthouse bash
 docker logs nethermind --tail 50
 docker logs lighthouse --tail 50
+
+
+****************
+Comandos de WLS
+****************
+#listar las distribuciones de Linus instaladas y su estado
+wsl -l -v
+
+# Lista todas las distribuciones WSL
+wsl --list --all
+
+# Desinstala Ubuntu (ambas versiones)
+wsl --unregister Ubuntu
+wsl --unregister Ubuntu-20.04
+
+#obtener la ip de WLS
+wsl hostname -I
+
+#Listar todos los discos virtuales de wsl
+Get-ChildItem "$env:USERPROFILE\AppData\Local\Packages" -Recurse -Filter ext4.vhdx -ErrorAction SilentlyContinue
+
+#Apagar WLS
+wsl --shutdown
+wsl  # Reinicia WSL
+
+******************
+Borrar docker por completo
+******************
+wsl --shutdown
+Remove-Item -Recurse -Force "$env:LOCALAPPDATA\Docker"
+Remove-Item -Recurse -Force "$env:USERPROFILE\.docker"
+Remove-Item -Recurse -Force "$env:APPDATA\Docker"
+
+
+
 
 #Monitorear logs específicos
 docker logs nethermind --tail 100 -f | grep -E 'Old Headers|Snap|Peers'
@@ -130,9 +172,10 @@ sudo wg-quick up wg0
 **********
 nethermind
 **********
-
 # Detener de forma correcta el nodo de Nethermaind
 docker stop nethermind
+
+docker-compose restart nethermind
 
 
 #CONSULTAR SI EL NODO ESTÁ CORRIENDO consultando el numero del bloque
@@ -152,3 +195,13 @@ $ curl -X POST http://localhost:8545 \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"net_peerCount","params":[]}'
 {"jsonrpc":"2.0","result":"0x29","id":1}
+
+
+#ver si ya se puede consultar la menpool
+curl -Uri "http://localhost:8545" -Method POST -Body '{"jsonrpc":"2.0","method":"eth_pendingTransactions","params":[],"id":1}' -ContentType "application/json"
+
+
+
+
+#abrir los puertos en windows (ejecutar en ´PowerShell como administrador)
+New-NetFirewallRule -DisplayName "Allow Nethermind Ports" -Direction Inbound -LocalPort 8545,8546,8551,5052 -Protocol TCP -Action Allow
