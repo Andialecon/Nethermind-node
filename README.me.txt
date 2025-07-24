@@ -7,16 +7,18 @@ docker-compose up -d
 docker exec -it geth-mempool geth attach
 eth.syncing
 eth.blockNumber
-docker system df
 docker restart geth-mempool
 docker restart frpc
 docker-compose down && docker-compose up -d
 
 #ver la cantidad de disco que ocupa docker
 docker system df
+docker stats
 
 #Eliminá imágenes y contenedores que no usás:
 docker system prune -a --volumes
+docker system prune --all --volumes -f
+
 docker logs frpc
 docker exec -it frpc sh
 docker network ls
@@ -191,13 +193,13 @@ curl -X POST http://localhost:8545 \
 
 #Consultar peer conectados
 Mauro@DESKTOP-0JKN22F MINGW64 ~/Documents/Ethereum node
-$ curl -X POST http://localhost:8545 \
+curl -X POST http://localhost:8545 \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"net_peerCount","params":[]}'
 {"jsonrpc":"2.0","result":"0x29","id":1}
 
 
-#ver si ya se puede consultar la menpool
+#ver si ya se puede consultar la menpool desde powershell
 curl -Uri "http://localhost:8545" -Method POST -Body '{"jsonrpc":"2.0","method":"eth_pendingTransactions","params":[],"id":1}' -ContentType "application/json"
 
 
@@ -205,3 +207,50 @@ curl -Uri "http://localhost:8545" -Method POST -Body '{"jsonrpc":"2.0","method":
 
 #abrir los puertos en windows (ejecutar en ´PowerShell como administrador)
 New-NetFirewallRule -DisplayName "Allow Nethermind Ports" -Direction Inbound -LocalPort 8545,8546,8551,5052 -Protocol TCP -Action Allow
+
+
+
+*******************************
+configurar nethermind en ubuntu
+*******************************
+1.Instalar docker.
+2.Crear un directorio para el proyecto
+mkdir -p ~/nethermind-docker
+
+3.Crear el archivo de docker-compose dentro de la nueva carpeta
+nano docker-compose.yml (pegar la configuracion en el editor de nano)
+
+4. Crear otros archivos como claves ect (ejemplo con clave para ethermind)
+openssl rand -hex 32 > engine.jwt
+
+5. Verifica que todos los archivos estén creados en el directorio
+ls -l ~/nethermind-docker
+
+6. iniciar docker
+cd ~/nethermind-docker
+docker-compose up -d
+
+
+
+*********************************************
+Aplicar prune a docker para recuperar espacio
+*********************************************
+
+wsl --shutdown
+Stop-Process -Name "Docker Desktop" -Force
+
+#Te dirá cuanto espacio se liberó de docker, sino se ve reflejado en el disco, comprime los discos que usa WSL
+docker system prune -a --volumes
+
+
+#Buscar en que ruta están los discos vhdx de WSL
+Get-ChildItem -Path "C:\" -Recurse -Filter *.vhdx -ErrorAction SilentlyContinue | Select-Object FullName
+
+# 1. Docker Data (donde está tu nodo)
+Optimize-VHD -Path "C:\Users\Mauro\AppData\Local\Docker\wsl\disk\docker_data.vhdx" -Mode Full
+
+# 2. Docker Main
+Optimize-VHD -Path "C:\Users\Mauro\AppData\Local\Docker\wsl\main\ext4.vhdx" -Mode Full
+
+# 3. Ubuntu (opcional)
+Optimize-VHD -Path "C:\Users\Mauro\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu20.04LTS_79rhkp1fndgsc\LocalState\ext4.vhdx" -Mode Full
