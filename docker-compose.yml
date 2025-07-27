@@ -12,10 +12,8 @@ services:
       - "8545:8545"   # HTTP RPC
       - "8546:8546"   # WebSocket RPC
       - "8551:8551"   # Engine API (para consenso)
-    deploy:
-      resources:
-        limits:
-          memory: 6G
+      - "30303:30303/tcp"  # P2P
+      - "30303:30303/udp"  # P2P
     command: [
       "--config=mainnet",
       "--datadir=/nethermind",
@@ -27,15 +25,17 @@ services:
       "--JsonRpc.JwtSecretFile=/engine.jwt",
       "--Sync.SnapSync=true",
       "--Init.StoreReceipts=false",
-      "--Sync.AncientBodiesBarrier=11000000",
-      "--Network.MaxActivePeers=100",
+      "--Sync.AncientBodiesBarrier=2100000",
+      "--Network.MaxActivePeers=70",
       "--Network.DiscoveryPort=30303",
       "--Network.P2PPort=30303",
       "--Pruning.Mode=Full",
       "--Pruning.CacheMb=2048",
       "--Pruning.FullPruningCompletionBehavior=ShutdownOnSuccess",
       "--HealthChecks.Enabled=true",
-      "--JsonRpc.EnabledModules=eth,TxPool,net,web3,admin",
+      "--JsonRpc.EnabledModules=eth,TxPool,net,web3",
+      "--Network.Bootnodes=enode://...@ip:port,enode://...@ip:port"
+
     ]
     depends_on:
       - lighthouse
@@ -49,10 +49,8 @@ services:
       - ./engine.jwt:/engine.jwt
     ports:
       - "5052:5052"
-    deploy:
-      resources:
-        limits:
-          memory: 4G
+      - "9000:9000/tcp"      # P2P TCP
+      - "9001:9001/udp"      # P2P QUIC
     command: >
       lighthouse bn
       --network mainnet
@@ -60,6 +58,7 @@ services:
       --execution-endpoint http://nethermind:8551
       --execution-jwt /engine.jwt
       --checkpoint-sync-url https://mainnet.checkpoint.sigp.io
+      --disable-upnp
 
 volumes:
   nethermind-data:

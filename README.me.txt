@@ -1,4 +1,12 @@
 
+********************************************
+conectar al servidor local de ubuntu por SSH
+********************************************
+ssh viralik@192.168.1.2
+
+#para saber la ip
+hostname -I
+
 ******************
 COMANDOS DE DOCKER
 ******************
@@ -35,6 +43,12 @@ Comandos de WLS
 ****************
 #listar las distribuciones de Linus instaladas y su estado
 wsl -l -v
+wsl --status
+
+wsl --unregister *
+dism.exe /online /disable-feature /featurename:Microsoft-Windows-Subsystem-Linux /norestart
+dism.exe /online /disable-feature /featurename:VirtualMachinePlatform /norestart
+Restart-Computer
 
 # Lista todas las distribuciones WSL
 wsl --list --all
@@ -191,6 +205,12 @@ curl -X POST http://localhost:8545 \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"eth_syncing","params":[]}'
 
+curl -X POST \
+>   -H "Content-Type: application/json" \
+>   --data '{"jsonrpc":"2.0","method":"eth_syncing","params":[],"id":1}' \
+>   http://localhost:8545
+{"jsonrpc":"2.0","result":{"startingBlock":"0x0","currentBlock":"0x0","highestBlock":"0x15ef1b6"},"id":1}
+
 #Consultar peer conectados
 Mauro@DESKTOP-0JKN22F MINGW64 ~/Documents/Ethereum node
 curl -X POST http://localhost:8545 \
@@ -236,12 +256,17 @@ docker-compose up -d
 Aplicar prune a docker para recuperar espacio
 *********************************************
 
-wsl --shutdown
 Stop-Process -Name "Docker Desktop" -Force
+wsl --shutdown
+
+#Compacta manualmente el disco virtual de WSL:
+diskpart
+select vdisk file="C:\Users\TU_USUARIO\AppData\Local\Docker\wsl\data\ext4.vhdx"
+compact vdisk
+exit
 
 #Te dirá cuanto espacio se liberó de docker, sino se ve reflejado en el disco, comprime los discos que usa WSL
 docker system prune -a --volumes
-
 
 #Buscar en que ruta están los discos vhdx de WSL
 Get-ChildItem -Path "C:\" -Recurse -Filter *.vhdx -ErrorAction SilentlyContinue | Select-Object FullName
