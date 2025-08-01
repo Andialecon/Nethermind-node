@@ -24,9 +24,10 @@ services:
       "--JsonRpc.EnginePort=8551",
       "--JsonRpc.JwtSecretFile=/engine.jwt",
       "--Sync.SnapSync=true",
+      "--Sync.FastSync=false",
       "--Init.StoreReceipts=false",
       "--Sync.AncientBodiesBarrier=2100000",
-      "--Network.MaxActivePeers=70",
+      "--Network.MaxActivePeers=50",
       "--Network.DiscoveryPort=30303",
       "--Network.P2PPort=30303",
       "--Pruning.Mode=Full",
@@ -34,8 +35,8 @@ services:
       "--Pruning.FullPruningCompletionBehavior=ShutdownOnSuccess",
       "--HealthChecks.Enabled=true",
       "--JsonRpc.EnabledModules=eth,TxPool,net,web3",
-      "--Network.Bootnodes=enode://...@ip:port,enode://...@ip:port"
-
+      "--Network.Bootnodes=enode://...@ip:port,enode://...@ip:port",
+      "--Sync.FastBlocks=false" 
     ]
     depends_on:
       - lighthouse
@@ -59,6 +60,8 @@ services:
       --execution-jwt /engine.jwt
       --checkpoint-sync-url https://mainnet.checkpoint.sigp.io
       --disable-upnp
+      --disable-deposit-contract-sync
+      --disable-enr-auto-update  
 
 volumes:
   nethermind-data:
